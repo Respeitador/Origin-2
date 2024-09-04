@@ -24,37 +24,52 @@ class Demo(tk.Tk):
 
     def plot_selected(self):
         # Get selected cells
-        selected_cells = self.sheet.get_selected_cells(sort_by_row=True)
+        selected_cells = self.sheet.get_selected_cells(sort_by_column=True)
         if not selected_cells:
             return  # No selection, do nothing
 
         # Get data from selected cells
         x_values = []
-        y_values = []
+        # y_values = []
         legendas = []
-        for col, row in selected_cells:
-            print(row, col)
+        separate_values = {}
+
+        for row, col in selected_cells:
+            if str(col) not in separate_values.keys():
+                separate_values[f'{col}'] = []
             if row == 0:  # First row as legend
                 legendas.append(self.sheet.get_cell_data(row, col))
             else:
-                x_valor = self.sheet.get_cell_data(row, 0)
                 y_valor = self.sheet.get_cell_data(row, col)
-                if x_valor != "" and y_valor != "":
-                    x_values.append(float(x_valor.replace(',', '.')))  # Convert to float
-                    y_values.append(float(y_valor.replace(',', '.')))  # Convert to float
+                if str(col) in separate_values.keys():
+                    separate_values[f'{col}'].append(float(y_valor.replace(',', '.'))) 
+
+        row_size = len(separate_values['1']) + 1
+        # print(row_size,separate_values['1'])
+        for row in range(row_size):
+            if row == 0:  # First row as legend
+                legendas.append(self.sheet.get_cell_data(row, 0))
+            else:
+                x_valor = self.sheet.get_cell_data(row, 0)
+                x_values.append(float(x_valor.replace(',', '.')))
+            # print(separate_values)
+
 
         # Plot values using matplotlib
-        if len(x_values) > 0 and len(y_values) > 0:
-            plt.scatter(x_values, y_values)#, label=legendas[0])  # Plot x_values with y_values
-            # plt.xticks(x_values, rotation=45)  # Rotate X axis labels
-            # plt.yticks(y_values)  # Add Y axis labels
-            plt.xlabel("Eixo X")
-            plt.ylabel("Eixo Y")
-            plt.title("Valores Selecionados")
-            plt.legend()  # Add legend with Y axis names
-            plt.show()
-        else:
-            print("Selecione células válidas para plotar")
+        for data in separate_values.values():
+                # print(data)
+            if len(data) > 0:
+                print(x_values,data.sort())
+                plt.scatter(x_values, data, label=legendas[0])  # Plot x_values with y_values
+        # plt.xticks(x_values, rotation=45)  # Rotate X axis labels
+        # plt.yticks(y_values)  # Add Y axis labels
+        plt.xlabel("Eixo X")
+        plt.ylabel("Eixo Y")
+        plt.title("Valores Selecionados")
+        plt.legend()  # Add legend with Y axis names
+        plt.show()
+        # else:
+        #     print("Selecione células válidas para plotar")
 
 app = Demo()
 app.mainloop()
