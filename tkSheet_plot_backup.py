@@ -56,11 +56,11 @@ class Demo(tk.Tk):
 
 
         # Plot values using matplotlib
-        for data in separate_values.values():
+        for legenda, data in zip(legendas,separate_values.values()):
                 # print(data)
             if len(data) > 0:
                 print(x_values,data.sort())
-                plt.scatter(x_values, data, label=legendas[0])  # Plot x_values with y_values
+                plt.scatter(x_values, data, label=legenda)  # Plot x_values with y_values
         # plt.xticks(x_values, rotation=45)  # Rotate X axis labels
         # plt.yticks(y_values)  # Add Y axis labels
         plt.xlabel("Eixo X")
