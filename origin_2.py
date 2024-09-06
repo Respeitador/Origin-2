@@ -1,5 +1,10 @@
 # Python3
 
+# This program opens a sheet in wich is possible to select values to plot a scatter graph where the
+# column 1 is always the X axys and line 1 is the nems of the columns. Along with that, it does statistical
+# annalisys in linnear fit and gives the slope values for those fits and with that value, calculate the
+# HexUÁc for the heparin used.
+
 # Este programa abre uma planilha em que é possivel selecionar valores para plotar um gráfico de scatter
 # em que a coluna 1 é sempre o eixo X e a linha 1 é a legenda das colunas. Juntamente, faz uma análise
 # estatística de linnear fit, da o valor de slope das linhas e com esse valor, calcula o valor de
@@ -38,46 +43,33 @@ class Demo(tk.Tk):
             return  # No selection, do nothing
 
         # Get data from selected cells
-        x_values = []
         legendas = []
-        separate_values = {}
+        dataSets = {}
 
         for row, col in selected_cells:
-            if str(col) not in separate_values.keys():
-                separate_values[f'{col}'] = []
+            if str(col) not in dataSets.keys():
+                dataSets[f'{col}'] = [[],[]]
             if row == 0:  # First row as legend
                 legendas.append(self.sheet.get_cell_data(row, col))
-            else:
-                y_valor = self.sheet.get_cell_data(row, col)
-                if str(col) in separate_values.keys():
-                    try:
-                        separate_values[f'{col}'].append(float(y_valor.replace(',', '.')))
-                    except:
-                        # separate_values[f'{col}'].append(y_valor)
-                        None
-
-        row_size = len(separate_values['1']) + 1
-        for row in range(row_size):
-            if row == 0:  # First row as legend
-                legendas.append(self.sheet.get_cell_data(row, 0))
-            else:
-                x_valor = self.sheet.get_cell_data(row, 0)
-                x_values.append(float(x_valor.replace(',', '.')))
-            # print(separate_values)
-        x_vectorized = np.array(x_values)[:,np.newaxis]
+            elif self.sheet.get_cell_data(row, col) != '':
+                    y_valor = self.sheet.get_cell_data(row, col)
+                    x_valor = self.sheet.get_cell_data(row, 0)
+                    if str(col) in dataSets.keys():
+                        try:
+                            dataSets[f'{col}'][1].append(float(y_valor.replace(',', '.')))
+                            dataSets[f'{col}'][0].append(float(x_valor.replace(',', '.')))
+                        except:
+                            None
 
         # Plot values using matplotlib
-        for legenda, data in zip(legendas,separate_values.values()):
-                # print(data)
-            if len(data) > 0:
-                data = sorted(data)
-                slope, _, _, _ = np.linalg.lstsq(x_vectorized, data)
-                print(f'Slope for {legenda} is {slope}')
-                plt.plot(x_vectorized, slope*x_vectorized)
-                plt.scatter(x_values, data, label=legenda)
-                  # Plot x_values with y_values
-        # plt.xticks(x_values, rotation=45)  # Rotate X axis labels
-        # plt.yticks(y_values)  # Add Y axis labels
+        for legenda, dataSet in zip(legendas,dataSets.values()):
+            xData = dataSet[0]
+            x_vectorized = np.array(dataSet[0])[:,np.newaxis]
+            yData = dataSet[1]
+            # yData = sorted(yData)
+            slope, _, _, _ = np.linalg.lstsq(x_vectorized, yData)
+            plt.plot(x_vectorized, slope*x_vectorized)
+            plt.scatter(xData, yData, label=f'{legenda} / slope = {slope[0]:.5f}')
         plt.xlabel("Eixo X")
         plt.ylabel("Eixo Y")
         plt.title("Valores Selecionados")
