@@ -31,7 +31,14 @@ class Demo(tk.Tk):
         self.frame.grid(row=0, column=0, sticky="nswe")
         self.sheet.grid(row=0, column=0, sticky="nswe")
 
-        self.sheet.set_options(table_bg="#82C294")
+        self.sheet.set_options(table_bg="#82C294") # trocar hexadecimal
+        for row in range(2):
+            for column in range(10):
+                if column == 10:
+                    row =+ 1
+                    column = 0
+                self.sheet.highlight_cells(row, column, bg="#e9a6ff")
+                column =+ 1
 
         # Create a figure and canvas for the plot
         self.fig = plt.Figure()
@@ -77,7 +84,7 @@ class Demo(tk.Tk):
             slope, _, _, _ = np.linalg.lstsq(x_vectorized, yData)
             self.ax.plot(x_vectorized, slope*x_vectorized)
             self.ax.scatter(xData, yData, label=f'{legenda} / slope = {slope[0]:.5f}')
-        self.ax.set_xlabel("Eixo X")
+        self.ax.set_xlabel("Volume uL")
         self.ax.set_ylabel("Eixo Y")
         self.ax.set_title("Valores Selecionados")
         self.ax.legend()  # Add legend with Y axis names
